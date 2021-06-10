@@ -69,15 +69,10 @@ vector<int> LinuxParser::Pids() {
 
 // TODO: Read and return the system memory utilization
 float LinuxParser::MemoryUtilization() { 
-  float memTotal;
-  float memFree;
-  float memAvailable;
-  float buffer;
-
+  float memTotal, memAvailable, value;
   std::string key;
-  float value;
-
   std::ifstream filestream(kProcDirectory + kMeminfoFilename);
+
   if (filestream.is_open()) {
     std::string line;
     while (std::getline(filestream, line)) {
@@ -85,18 +80,12 @@ float LinuxParser::MemoryUtilization() {
       while (linestream >> key >> value) {
         if (key == "MemTotal:") {
           memTotal = value;
-        } else if (key == "MemFree:") {
-          memFree = value;
         } else if (key == "MemAvailable:") {
           memAvailable = value;
-        } else if (key == "Buffers:") {
-          buffer = value;
         }
       }
     }
   }
-  // TODO - Handle errors
-  // TODO - Maybe break above if statement if all captured
   return (memTotal - memAvailable) / memTotal;
 }
 
@@ -226,7 +215,7 @@ string LinuxParser::Ram(int pid) {
       }
     }    
   }
-  return string();
+  return string("0");
 }
 
 // TODO: Read and return the user ID associated with a process
