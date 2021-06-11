@@ -102,7 +102,7 @@ long LinuxParser::UpTime() {
 }
 
 // TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+long LinuxParser::Jiffies() { return LinuxParser::ActiveJiffies() + LinuxParser::IdleJiffies(); }
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
@@ -122,13 +122,23 @@ long LinuxParser::ActiveJiffies(int pid) {
 }
 
 // TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+long LinuxParser::ActiveJiffies() { 
+  std::vector<std::string> SystemCPUJiffies = LinuxParser::CpuUtilization();
+  long activeJiffies = 
+        std::stol(SystemCPUJiffies[LinuxParser::kUser_]) + 
+        std::stol(SystemCPUJiffies[LinuxParser::kNice_]) + 
+        std::stol(SystemCPUJiffies[LinuxParser::kSystem_]) + 
+        std::stol(SystemCPUJiffies[LinuxParser::kIRQ_]) +
+        std::stol(SystemCPUJiffies[LinuxParser::kSoftIRQ_]) + 
+        std::stol(SystemCPUJiffies[LinuxParser::kSteal_]);
+  return activeJiffies; 
+}
 
 // TODO: Read and return the number of idle jiffies for the system
 long LinuxParser::IdleJiffies() { 
   std::vector<std::string> SystemCPUJiffies = LinuxParser::CpuUtilization();
-  long idle = std::stol(SystemCPUJiffies[LinuxParser::kIdle_]) + std::stol(SystemCPUJiffies[LinuxParser::kIOwait_]);
-  return idle;
+  long idleJiffies = std::stol(SystemCPUJiffies[LinuxParser::kIdle_]) + std::stol(SystemCPUJiffies[LinuxParser::kIOwait_]);
+  return idleJiffies;
 }
 
 // TODO: Read and return CPU utilization
@@ -208,7 +218,7 @@ string LinuxParser::Ram(int pid) {
       std::stringstream linestream(line);
       while (linestream >> key >> value) {      
         if (key == "VmSize:") {
-          long megaBytes = std::stol(value) / 1000;        
+          long megaBytes = std::stol(value) / 1024;        
           return to_string(megaBytes);
         }
       }
