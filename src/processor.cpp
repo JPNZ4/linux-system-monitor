@@ -19,5 +19,5 @@ float Processor::Utilization() {
     }
     previousTotal_ = totalJiffies;
     previousIdle_ = idleJiffies;
-    return (totalJiffies - idleJiffies) / totalJiffies; 
+    return activeJiffies / totalJiffies; 
 }
