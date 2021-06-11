@@ -72,7 +72,6 @@ float LinuxParser::MemoryUtilization() {
   float memTotal, memAvailable, value;
   std::string key;
   std::ifstream filestream(kProcDirectory + kMeminfoFilename);
-
   if (filestream.is_open()) {
     std::string line;
     while (std::getline(filestream, line)) {
